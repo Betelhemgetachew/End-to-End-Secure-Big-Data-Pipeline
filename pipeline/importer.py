@@ -166,6 +166,7 @@ def import_dataset(
         print(f"Successfully imported {len(dataframe)} customer records.")
         print(f"Upload ID : {upload_id}")
         print(f"Batch ID  : {batch_id}")
+        return upload_id, batch_id
 
     except Exception as e:
 
