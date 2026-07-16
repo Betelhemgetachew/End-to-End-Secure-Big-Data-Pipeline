@@ -1,122 +1,100 @@
-import uuid
-
 from auth import login
-from authorization import has_permission
-
-from validator import validate_dataset
-from hasher import generate_hash, save_hash
-from importer import import_dataset
+from workflow import validate_workflow, import_workflow
+from viewer import view_logs
 from logger import log_event
+from verifier import verify_dataset_hash
+from security_viewer import view_security_events
 
-DATASET = "dataset/customers.csv"
-HASH_FILE = "hashes/customers.sha256"
 
-# ============================================================
-# Step 1: User Authentication
-# ============================================================
+def display_menu(username, role):
+    """
+    Display the main menu.
+    """
 
-user = login()
+    print("\n")
+    print("=" * 55)
+    print("      END-TO-END SECURE BIG DATA PIPELINE")
+    print("=" * 55)
 
-if user is None:
-    print("\nAccess denied.")
-    exit()
+    print(f"Logged in as : {username}")
+    print(f"Role         : {role}")
 
-username, role = user
+    print("-" * 55)
+    print("1. Validate Dataset")
+    print("2. Run Secure Import Pipeline")
+    print("3. Verify Dataset Integrity")
+    print("4. View Audit Logs")
+    print("5. Exit")
+    print("-" * 55)
 
-# ============================================================
-# Step 2: Validate the dataset
-# ============================================================
 
-if not has_permission(role, "validate"):
+def main():
 
-    log_event(
-        username=username,
-        action="Permission Denied: Validate Dataset",
-        status="FAILED"
-    )
+    # -----------------------------
+    # Login
+    # -----------------------------
 
-    print("\nYou are not authorized to validate datasets.")
-    exit()
+    user = login()
 
-valid, df = validate_dataset(DATASET)
+    if user is None:
+        print("\nAccess denied.")
+        return
 
-if not valid:
+    username, role = user
 
-    log_event(
-        username=username,
-        action="Dataset Validation",
-        status="FAILED"
-    )
+    # -----------------------------
+    # Menu Loop
+    # -----------------------------
 
-    print("\nPipeline stopped.")
-    exit()
+    while True:
 
-log_event(
-    username=username,
-    action="Dataset Validation",
-    status="SUCCESS"
-)
+        display_menu(username, role)
 
-print("\nPipeline can continue.")
+        choice = input("\nChoose an option: ")
 
-# ============================================================
-# Step 3: Generate SHA-256 hash
-# ============================================================
+        if choice == "1":
 
-print("\nGenerating SHA-256 hash...")
+            validate_workflow(
+                username,
+                role
+            )
 
-hash_value = generate_hash(DATASET)
+        elif choice == "2":
 
-print("Hash generated successfully.")
-print(hash_value)
-log_event(
-    username=username,
-    action="SHA-256 Hash Generated",
-    status="SUCCESS"
-)
+            import_workflow(
+                username,
+                role
+            )
 
-# ============================================================
-# Step 4: Save the hash
-# ============================================================
+        elif choice == "3":
 
-save_hash(hash_value, HASH_FILE)
+            verify_dataset_hash(
+                username,
+                role
+            )
 
-print(f"\nHash saved to: {HASH_FILE}")
+        elif choice == "4":
 
-# ============================================================
-# Step 5: Generate Batch ID
-# ============================================================
+            view_logs(
+                username,
+                role
+            )
 
-batch_id = f"BATCH-{uuid.uuid4().hex[:8]}"
+        elif choice == "5":
 
-print(f"\nGenerated Batch ID: {batch_id}")
+            log_event(
+                username=username,
+                action="User Logout",
+                status="SUCCESS"
+            )
 
-# ============================================================
-# Step 6: Import the dataset
-# ============================================================
+            print("\nGoodbye!")
+            break
 
-if not has_permission(role, "import"):
+        else:
 
-    print("DEBUG: About to log permission denial")
+            print("\nInvalid option. Please try again.")
 
-    log_event(
-        username=username,
-        action="Permission Denied: Import Dataset",
-        status="FAILED"
-    )
 
-    print("DEBUG: Permission denial logged")
-
-    print("\nYou are not authorized to import datasets.")
-    exit()
-
-print("\nImporting dataset into PostgreSQL...")
-
-import_dataset(
-    file_path=DATASET,
-    batch_id=batch_id,
-    file_hash=hash_value,
-    uploaded_by=username
-)
-
-print("\nPipeline completed successfully.")
+if __name__ == "__main__":
+    main()
