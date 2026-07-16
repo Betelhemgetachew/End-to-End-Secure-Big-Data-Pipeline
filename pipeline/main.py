@@ -6,6 +6,7 @@ from authorization import has_permission
 from validator import validate_dataset
 from hasher import generate_hash, save_hash
 from importer import import_dataset
+from logger import log_event
 
 DATASET = "dataset/customers.csv"
 HASH_FILE = "hashes/customers.sha256"
@@ -33,8 +34,21 @@ if not has_permission(role, "validate"):
 valid, df = validate_dataset(DATASET)
 
 if not valid:
+
+    log_event(
+        username=username,
+        action="Dataset Validation",
+        status="FAILED"
+    )
+
     print("\nPipeline stopped.")
     exit()
+
+log_event(
+    username=username,
+    action="Dataset Validation",
+    status="SUCCESS"
+)
 
 print("\nPipeline can continue.")
 
@@ -48,6 +62,11 @@ hash_value = generate_hash(DATASET)
 
 print("Hash generated successfully.")
 print(hash_value)
+log_event(
+    username=username,
+    action="SHA-256 Hash Generated",
+    status="SUCCESS"
+)
 
 # ============================================================
 # Step 4: Save the hash

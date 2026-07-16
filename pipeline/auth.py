@@ -1,6 +1,7 @@
 from database import get_connection
 import bcrypt
 from getpass import getpass
+from logger import log_event
 
 
 def hash_password(password):
@@ -107,6 +108,13 @@ def login():
     connection.close()
 
     if user is None:
+
+        log_event(
+            username=username,
+            action="Failed Login",
+            status="FAILED"
+        )
+
         print("\nInvalid username or password.")
         return None
 
@@ -114,11 +122,23 @@ def login():
 
     if verify_password(password, stored_hash):
 
+        log_event(
+            username=username,
+            action="User Login",
+            status="SUCCESS"
+        )
+
         print("\nLogin successful.")
         print(f"Welcome {username}.")
         print(f"Role: {role}")
 
         return username, role
+
+    log_event(
+    username=username,
+    action="Failed Login",
+    status="FAILED"
+)
 
     print("\nInvalid username or password.")
     return None

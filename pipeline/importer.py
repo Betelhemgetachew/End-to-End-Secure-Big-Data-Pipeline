@@ -5,7 +5,7 @@ from psycopg2.extras import execute_values
 
 from database import get_connection
 from encryption import encrypt_data
-
+from logger import log_event
 
 def read_dataset(file_path):
     """
@@ -163,6 +163,12 @@ def import_dataset(
             upload_id=upload_id,
         )
 
+        log_event(
+            username=uploaded_by,
+            action="Dataset Imported",
+            status="SUCCESS"
+)
+
         print(f"Successfully imported {len(dataframe)} customer records.")
         print(f"Upload ID : {upload_id}")
         print(f"Batch ID  : {batch_id}")
@@ -172,10 +178,15 @@ def import_dataset(
 
         connection.rollback()
 
+        log_event(
+            username=uploaded_by,
+            action="Dataset Imported",
+            status="FAILED"
+        )
+
         print(f"Import failed: {e}")
 
         raise
-
     finally:
 
         connection.close()
