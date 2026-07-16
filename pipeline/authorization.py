@@ -30,11 +30,4 @@ def has_permission(role, permission):
 
 
 
-    print(has_permission("ADMIN", "import"))
-    print(has_permission("ADMIN", "view_logs"))
-
-    print(has_permission("ANALYST", "import"))
-    print(has_permission("ANALYST", "encrypt"))
-
-    print(has_permission("AUDITOR", "verify_hash"))
-    print(has_permission("AUDITOR", "import"))
+    

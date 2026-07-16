@@ -28,6 +28,13 @@ username, role = user
 # ============================================================
 
 if not has_permission(role, "validate"):
+
+    log_event(
+        username=username,
+        action="Permission Denied: Validate Dataset",
+        status="FAILED"
+    )
+
     print("\nYou are not authorized to validate datasets.")
     exit()
 
@@ -89,6 +96,17 @@ print(f"\nGenerated Batch ID: {batch_id}")
 # ============================================================
 
 if not has_permission(role, "import"):
+
+    print("DEBUG: About to log permission denial")
+
+    log_event(
+        username=username,
+        action="Permission Denied: Import Dataset",
+        status="FAILED"
+    )
+
+    print("DEBUG: Permission denial logged")
+
     print("\nYou are not authorized to import datasets.")
     exit()
 
