@@ -1,5 +1,6 @@
 from database import get_connection
 import bcrypt
+from getpass import getpass
 
 
 def hash_password(password):
@@ -80,22 +81,47 @@ def create_user(username, password, role):
 
     print(f"User '{username}' created successfully.")
 
+def login():
+    """
+    Authenticate a user.
+    """
+
+    username = input("Username: ")
+    password = getpass("Password: ")
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT password_hash, role
+        FROM users
+        WHERE username = %s
+        """,
+        (username,)
+    )
+
+    user = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    if user is None:
+        print("\nInvalid username or password.")
+        return None
+
+    stored_hash, role = user
+
+    if verify_password(password, stored_hash):
+
+        print("\nLogin successful.")
+        print(f"Welcome {username}.")
+        print(f"Role: {role}")
+
+        return username, role
+
+    print("\nInvalid username or password.")
+    return None
+
 if __name__ == "__main__":
-
-    create_user(
-        "admin",
-        "Admin@2026",
-        "ADMIN"
-    )
-
-    create_user(
-        "analyst",
-        "Analyst@2026",
-        "ANALYST"
-    )
-
-    create_user(
-        "auditor",
-        "Audit@2026",
-        "AUDITOR"
-    )
+    login()
