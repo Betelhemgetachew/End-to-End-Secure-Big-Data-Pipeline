@@ -24,7 +24,8 @@ def display_menu(username, role):
     print("2. Run Secure Import Pipeline")
     print("3. Verify Dataset Integrity")
     print("4. View Audit Logs")
-    print("5. Exit")
+    print("5. View Security Events")
+    print("6. Exit")
     print("-" * 55)
 
 
@@ -82,6 +83,13 @@ def main():
 
         elif choice == "5":
 
+            view_security_events(
+                username,
+                role
+            )
+
+        elif choice == "6":
+
             log_event(
                 username=username,
                 action="User Logout",
@@ -90,6 +98,7 @@ def main():
 
             print("\nGoodbye!")
             break
+
 
         else:
 
