@@ -10,8 +10,7 @@ PERMISSIONS = {
     ],
 
     "ANALYST": [
-        "validate",
-        "import"
+        "validate"
     ],
 
     "AUDITOR": [
@@ -21,7 +20,6 @@ PERMISSIONS = {
     ]
 
 }
-
 
 def has_permission(role, permission):
     """

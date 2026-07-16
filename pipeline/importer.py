@@ -157,6 +157,12 @@ def import_dataset(
             file_hash=file_hash,
         )
 
+        log_event(
+            username=uploaded_by,
+            action="Sensitive Data Encrypted",
+            status="SUCCESS"
+        )
+
         insert_customers(
             connection=connection,
             dataframe=dataframe,
