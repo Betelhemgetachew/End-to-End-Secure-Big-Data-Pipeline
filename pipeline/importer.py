@@ -4,6 +4,7 @@ import pandas as pd
 from psycopg2.extras import execute_values
 
 from database import get_connection
+from encryption import encrypt_data
 
 
 def read_dataset(file_path):
@@ -88,21 +89,20 @@ def insert_customers(connection, dataframe, upload_id):
     cursor = connection.cursor()
 
     records = [
-        (
-            upload_id,
-            row.first_name,
-            row.last_name,
-            row.email,
-            row.phone,
-            row.national_id,
-            row.city,
-            row.account_number,
-            row.account_type,
-            row.account_balance,
-        )
-        for row in dataframe.itertuples(index=False)
-    ]
-
+    (
+        upload_id,
+        encrypt_data(row.first_name),
+        encrypt_data(row.last_name),
+        encrypt_data(row.email),
+        encrypt_data(row.phone),
+        encrypt_data(row.national_id),
+        row.city,
+        row.account_number,
+        row.account_type,
+        row.account_balance,
+    )
+    for row in dataframe.itertuples(index=False)
+]
     execute_values(
         cursor,
         """
