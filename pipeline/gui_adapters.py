@@ -206,22 +206,27 @@ def run_verify_integrity(username, role, file_path, hash_file):
 # Audit logs / security events (Phase 9 / 12) - read-only queries
 # ---------------------------------------------------------------------------
 
-def get_audit_logs(username, role, limit=50):
+def get_audit_logs(username, role, limit=None):
+    """
+    Returns every audit log row, newest first. Pass a limit explicitly
+    if you ever want to cap it again — None means no limit.
+    """
     if not has_permission(role, "view_logs"):
         log_event(username=username, action="Permission Denied: View Audit Logs", status="FAILED")
         return None
 
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute(
-        """
+    query = """
         SELECT log_id, username, action, status, log_time
         FROM audit_logs
         ORDER BY log_time DESC
-        LIMIT %s;
-        """,
-        (limit,),
-    )
+    """
+    if limit:
+        query += " LIMIT %s;"
+        cursor.execute(query, (limit,))
+    else:
+        cursor.execute(query + ";")
     rows = cursor.fetchall()
     cursor.close()
     connection.close()
@@ -230,15 +235,18 @@ def get_audit_logs(username, role, limit=50):
     return rows
 
 
-def get_security_events(username, role, limit=50):
+def get_security_events(username, role, limit=None):
+    """
+    Returns every security-relevant event, newest first. Pass a limit
+    explicitly if you ever want to cap it again — None means no limit.
+    """
     if not has_permission(role, "view_security_events"):
         log_event(username=username, action="Permission Denied: View Security Events", status="FAILED")
         return None
 
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute(
-        """
+    query = """
         SELECT log_id, username, action, status, log_time
         FROM audit_logs
         WHERE
@@ -247,10 +255,12 @@ def get_security_events(username, role, limit=50):
             OR action ILIKE '%%Integrity%%'
             OR action ILIKE '%%Encrypted%%'
         ORDER BY log_time DESC
-        LIMIT %s;
-        """,
-        (limit,),
-    )
+    """
+    if limit:
+        query += " LIMIT %s;"
+        cursor.execute(query, (limit,))
+    else:
+        cursor.execute(query + ";")
     rows = cursor.fetchall()
     cursor.close()
     connection.close()
