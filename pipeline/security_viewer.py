@@ -32,7 +32,7 @@ def view_security_events(username, role):
             log_time
         FROM audit_logs
         WHERE
-            action ILIKE '%Failed%'
+            status IN ('FAILED', 'WARNING')
             OR action ILIKE '%Permission Denied%'
             OR action ILIKE '%Integrity%'
             OR action ILIKE '%Encrypted%'

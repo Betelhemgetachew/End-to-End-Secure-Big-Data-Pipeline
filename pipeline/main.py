@@ -4,6 +4,7 @@ from viewer import view_logs
 from logger import log_event
 from verifier import verify_dataset_hash
 from security_viewer import view_security_events
+from exporter import export_data
 
 
 def display_menu(username, role):
@@ -25,7 +26,8 @@ def display_menu(username, role):
     print("3. Verify Dataset Integrity")
     print("4. View Audit Logs")
     print("5. View Security Events")
-    print("6. Exit")
+    print("6. Export Customer Data")
+    print("7. Exit")
     print("-" * 55)
 
 
@@ -90,11 +92,9 @@ def main():
 
         elif choice == "6":
 
-            log_event(
-                username=username,
-                action="User Logout",
-                status="SUCCESS"
-            )
+            export_data(username, role)
+
+        elif choice == "7":
 
             print("\nGoodbye!")
             break

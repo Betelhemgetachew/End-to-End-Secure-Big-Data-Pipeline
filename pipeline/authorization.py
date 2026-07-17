@@ -6,7 +6,8 @@ PERMISSIONS = {
         "encrypt",
         "verify_hash",
         "view_logs",
-        "view_security_events"
+        "view_security_events",
+        "export"
     ],
 
     "ANALYST": [
