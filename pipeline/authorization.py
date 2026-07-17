@@ -11,7 +11,8 @@ PERMISSIONS = {
     ],
 
     "ANALYST": [
-        "validate"
+        "validate",
+        "verify_hash"
     ],
 
     "AUDITOR": [
