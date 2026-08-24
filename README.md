@@ -2,7 +2,7 @@
 
 A secure, end-to-end data pipeline built for **DSA 4030: Big Data Security**. The system ingests customer records, authenticates and authorizes users by role, encrypts sensitive fields, verifies data integrity, logs every action, and monitors the environment in real time - accessible through both a command-line interface and a desktop GUI.
 
-**Group 17** · United States International University – Africa
+**Group 17** 
 
 ---
 
