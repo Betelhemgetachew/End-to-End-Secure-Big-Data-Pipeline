@@ -1,6 +1,6 @@
 # End-to-End Secure Big Data Pipeline
 
-A secure, end-to-end data pipeline built for **DSA 4030: Big Data Security**. The system ingests customer records, authenticates and authorizes users by role, encrypts sensitive fields, verifies data integrity, logs every action, and monitors the environment in real time — accessible through both a command-line interface and a desktop GUI.
+A secure, end-to-end data pipeline built for **DSA 4030: Big Data Security**. The system ingests customer records, authenticates and authorizes users by role, encrypts sensitive fields, verifies data integrity, logs every action, and monitors the environment in real time - accessible through both a command-line interface and a desktop GUI.
 
 **Group 17** · United States International University – Africa
 
@@ -44,7 +44,7 @@ A synthetic dataset of **100,000 Kenyan customer records** is generated with [Fa
 ## Architecture
 
 <p align="center">
-  <img src="report_assets/architecture_diagram.png" alt="System architecture diagram" width="800">
+  <img src="Architecture.png" alt="System architecture diagram" width="800">
 </p>
 
 The system runs as three Dockerized services (PostgreSQL, pgAdmin, Grafana) behind a Python application layer that implements every security control. Both the CLI and the desktop GUI call the same backend modules directly, so security behavior is identical regardless of which interface is used.
