@@ -187,7 +187,7 @@ python app.py
 The GUI mirrors the CLI's capabilities with a role-aware sidebar, a native file picker for imports, live progress feedback, and a one-click link to the Grafana dashboard. See screenshots below.
 
 <p align="center">
-  <img src="report_assets/incident3_dataset_tampering.png" alt="Desktop GUI — integrity verification" width="500">
+  <img src="evidence/incident3_dataset_tampering.png" alt="Desktop GUI — integrity verification" width="500">
 </p>
 
 ### Monitoring
