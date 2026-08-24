@@ -178,6 +178,10 @@ python main.py
 
 Log in and choose from the menu: validate a dataset, run the secure import pipeline, verify integrity, view audit logs, view security events, or export data.
 
+<p align="center">
+  <img src="tests_and_incidents\Incident 3 – Dataset Tampering/Integrity_verification_failed.png" alt="CLI — integrity verification" width="500">
+</p>
+
 ### Desktop GUI
 
 ```bash
@@ -187,7 +191,7 @@ python app.py
 The GUI mirrors the CLI's capabilities with a role-aware sidebar, a native file picker for imports, live progress feedback, and a one-click link to the Grafana dashboard. See screenshots below.
 
 <p align="center">
-  <img src="tests_and_incidents\Incident 3 – Dataset Tampering/Integrity_verification_failed.png" alt="Desktop GUI — integrity verification" width="500">
+  <img src="tests_and_incidents/failed_verification_GUI.png" alt="Desktop GUI — integrity verification" width="500">
 </p>
 
 ### Monitoring
