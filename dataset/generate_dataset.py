@@ -3,6 +3,9 @@ import random
 import pandas as pd
 from faker import Faker
 
+SEED = 42
+random.seed(SEED)
+Faker.seed(SEED)
 fake = Faker()
 
 NUM_RECORDS = 100_000

@@ -2,7 +2,9 @@
 
 A secure, end-to-end data pipeline built for **DSA 4030: Big Data Security**. The system ingests customer records, authenticates and authorizes users by role, encrypts sensitive fields, verifies data integrity, logs every action, and monitors the environment in real time - accessible through both a command-line interface and a desktop GUI.
 
-**Group 17** 
+**Group 17**
+
+**My role:** I designed and built the entire system: the Docker environment, the PostgreSQL schema, the Python pipeline (validation, hashing, encryption, import and export), authentication and role-based access control, audit logging, the desktop GUI, and the security tests.
 
 ---
 
@@ -67,46 +69,40 @@ The system runs as three Dockerized services (PostgreSQL, pgAdmin, Grafana) behi
 
 ## Project Structure
 
+Run every command from the repository root.
+
 ```
 End-to-End-Secure-Big-Data-Pipeline/
-├── main.py                 # CLI entry point and menu
-├── app.py                  # Desktop GUI entry point
-├── gui_adapters.py         # Bridges the GUI to the backend modules below
-│
-├── config.py                # Database configuration
-├── database.py               # Reusable PostgreSQL connection
-├── auth.py                    # bcrypt authentication
-├── authorization.py            # RBAC permission definitions
-├── validator.py                 # Dataset validation
-├── hasher.py                     # SHA-256 hashing and verification
-├── encryption.py                  # Fernet field-level encryption
-├── importer.py                     # Secure import pipeline
-├── exporter.py                      # Export with bulk-export detection
-├── logger.py                         # Audit log writer
-├── viewer.py / security_viewer.py     # Audit log / security event viewers (CLI)
-├── verifier.py                         # Integrity verification (CLI)
-├── workflow.py                          # Validate/import orchestration (CLI)
-├── generate_dataset.py                   # Synthetic dataset generator
-│
-├── ui/                                    # Desktop GUI screens
-│   ├── login_frame.py
-│   ├── main_frame.py
-│   ├── dashboard_frame.py
-│   ├── import_frame.py
-│   ├── validate_frame.py
-│   ├── verify_frame.py
-│   ├── export_frame.py
-│   ├── log_table_frame.py
-│   ├── grafana_frame.py
-│   └── theme.py
-│
-├── schema.sql                # Full PostgreSQL DDL
-├── docker-compose.yml         # PostgreSQL, pgAdmin, and Grafana services
-├── dataset/                    # Generated customer dataset (CSV)
-├── hashes/                      # Stored SHA-256 hashes per import batch
-├── keys/                          # Fernet encryption key
-└── exports/                        # Exported customer data
+├── pipeline/
+│   ├── main.py                 # CLI entry point and menu
+│   ├── app.py                  # Desktop GUI entry point
+│   ├── gui_adapters.py         # Bridges the GUI to the backend modules
+│   ├── config.py               # Database settings (read from .env)
+│   ├── database.py             # PostgreSQL connection
+│   ├── auth.py                 # bcrypt authentication
+│   ├── authorization.py        # RBAC permission definitions
+│   ├── validator.py            # Dataset validation
+│   ├── hasher.py               # SHA-256 hashing and verification
+│   ├── encryption.py           # Fernet field-level encryption
+│   ├── importer.py             # Secure import pipeline
+│   ├── exporter.py             # Export with bulk-export detection
+│   ├── logger.py               # Audit log writer
+│   ├── viewer.py, security_viewer.py   # Audit log / security event viewers (CLI)
+│   ├── verifier.py             # Integrity verification (CLI)
+│   ├── workflow.py             # Validate/import orchestration (CLI)
+│   └── ui/                     # Desktop GUI screens
+├── database/schema.sql         # Full PostgreSQL DDL
+├── dataset/
+│   ├── generate_dataset.py     # Synthetic dataset generator (seeded)
+│   └── customers.csv           # 100,000 synthetic customer records
+├── hashes/                     # Stored SHA-256 hashes
+├── docker-compose.yaml         # PostgreSQL, pgAdmin and Grafana
+├── .env.example                # Template for credentials (copy to .env)
+├── evidence/, tests_and_incidents/   # Screenshots from the security tests
+└── Group17_Secure_Big_Data_Pipeline_Report (2).pdf
 ```
+
+`keys/` (the encryption key), `exports/` and `.env` are created locally and are git-ignored, so no secrets are stored in the repository.
 
 ## Getting Started
 
@@ -119,12 +115,18 @@ End-to-End-Secure-Big-Data-Pipeline/
 ### 1. Clone and install dependencies
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Betelhemgetachew/End-to-End-Secure-Big-Data-Pipeline.git
 cd End-to-End-Secure-Big-Data-Pipeline
 pip install -r requirements.txt
 ```
 
-### 2. Start the environment
+### 2. Set your credentials
+
+```bash
+cp .env.example .env    # then edit .env and choose your own passwords
+```
+
+### 3. Start the environment
 
 ```bash
 docker compose up -d
@@ -138,30 +140,30 @@ This starts three containers:
 | pgAdmin | 5050 | Database administration |
 | Grafana | 3000 | Security monitoring dashboards |
 
-### 3. Configure the database
-
-Update `config.py` with your PostgreSQL credentials, then apply the schema:
+### 4. Create the tables
 
 ```bash
-psql -h localhost -U <your_user> -d secure_pipeline -f schema.sql
+docker exec -i postgres psql -U admin -d secure_pipeline < database/schema.sql
 ```
 
-### 4. Generate the encryption key
+(Use the `DB_USER` and `DB_NAME` values from your `.env` if you changed them.)
 
-```python
-from encryption import generate_key
-generate_key()
-```
-
-### 5. Generate the dataset
+### 5. Generate the encryption key
 
 ```bash
-python generate_dataset.py
+python -c "import sys; sys.path.insert(0, 'pipeline'); from encryption import generate_key; generate_key()"
 ```
 
-### 6. Create user accounts
+### 6. (Optional) Regenerate the dataset
+
+```bash
+python dataset/generate_dataset.py
+```
+
+### 7. Create user accounts
 
 ```python
+import sys; sys.path.insert(0, "pipeline")
 from auth import create_user
 create_user("admin", "your_password", "ADMIN")
 create_user("analyst", "your_password", "ANALYST")
@@ -173,19 +175,19 @@ create_user("auditor", "your_password", "AUDITOR")
 ### Command-line interface
 
 ```bash
-python main.py
+python pipeline/main.py
 ```
 
 Log in and choose from the menu: validate a dataset, run the secure import pipeline, verify integrity, view audit logs, view security events, or export data.
 
 <p align="center">
-  <img src="tests_and_incidents\Incident 3 – Dataset Tampering/Integrity_verification_failed.png" alt="CLI — integrity verification" width="500">
+  <img src="tests_and_incidents/Incident%203%20%E2%80%93%20Dataset%20Tampering/Integrity_verification_failed.png" alt="CLI — integrity verification" width="500">
 </p>
 
 ### Desktop GUI
 
 ```bash
-python app.py
+python pipeline/app.py
 ```
 
 The GUI mirrors the CLI's capabilities with a role-aware sidebar, a native file picker for imports, live progress feedback, and a one-click link to the Grafana dashboard. See screenshots below.
@@ -210,7 +212,7 @@ Five tables make up the `secure_pipeline` database:
 | `audit_logs` | Every action performed in the system |
 | `security_events` | A filtered view of failures, warnings, and permission denials |
 
-Full DDL is in [`schema.sql`](schema.sql).
+Full DDL is in [`database/schema.sql`](database/schema.sql).
 
 ## Roles & Permissions
 
@@ -220,7 +222,7 @@ Full DDL is in [`schema.sql`](schema.sql).
 | **Analyst** | ✅ | — | — | ✅ | — | — | — |
 | **Auditor** | — | — | — | ✅ | ✅ | ✅ | — |
 
-Every check is enforced by [`authorization.py`](authorization.py), and every denial is logged.
+Every check is enforced by [`pipeline/authorization.py`](pipeline/authorization.py), and every denial is logged.
 
 ## Security Testing
 
@@ -242,8 +244,9 @@ Three simulated incidents (unauthorized login, privilege escalation, and dataset
 
 - `pandas.read_sql()` raises a SQLAlchemy compatibility warning when used with a raw `psycopg2` connection; functionally correct but should be wrapped with `create_engine()`.
 - The Grafana dashboard is opened in a browser rather than embedded in the desktop GUI (CustomTkinter cannot render web content natively).
-- The encryption key and database credentials are stored as local files/plaintext config, suitable for a prototype but not production use.
+- Credentials live in a local `.env` file and the encryption key in a local file (both git-ignored). That is fine for a prototype, but production would need a secrets manager.
 - Testing is currently manual; there is no automated test suite or CI pipeline.
+- The validator checks structure, duplicates, account types, balances and phone format (`+254` plus 9 digits), but not email format or national ID length.
 - No multi-factor authentication or login rate limiting has been implemented.
 
 ## Roadmap

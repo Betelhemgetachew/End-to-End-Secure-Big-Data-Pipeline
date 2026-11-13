@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -13,6 +14,10 @@ REQUIRED_COLUMNS = [
     "account_type",
     "account_balance"
 ]
+
+TEXT_COLUMNS = {"phone": str, "national_id": str}
+
+PHONE_PATTERN = re.compile(r"^\+254\d{9}$")
 
 VALID_ACCOUNT_TYPES = {
     "standard",
@@ -45,7 +50,7 @@ def validate_dataset(file_path):
     # -------------------------
 
     try:
-        df = pd.read_csv(file_path)
+        df = pd.read_csv(file_path, dtype=TEXT_COLUMNS)
     except Exception as e:
         errors.append(str(e))
         print_errors(errors)
@@ -98,6 +103,19 @@ def validate_dataset(file_path):
         if duplicates > 0:
             errors.append(
                 f"Duplicate account numbers found: {duplicates}"
+            )
+
+    # -------------------------
+    # Phone number format (+254 followed by 9 digits)
+    # Catches values corrupted by spreadsheet software, e.g. "2.54774E+11"
+    # -------------------------
+
+    if "phone" in df.columns:
+        bad_phones = (~df["phone"].astype(str).str.match(PHONE_PATTERN)).sum()
+
+        if bad_phones > 0:
+            errors.append(
+                f"Invalid phone numbers: {bad_phones}"
             )
 
     # -------------------------

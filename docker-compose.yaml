@@ -4,9 +4,9 @@ services:
     container_name: postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: SecurePipeline@2026
-      POSTGRES_DB: secure_pipeline
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5432:5432"
     volumes:
@@ -17,8 +17,8 @@ services:
     container_name: pgadmin
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@securepipeline.com
-      PGADMIN_DEFAULT_PASSWORD: SecurePipeline@2026
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
     ports:
       - "5050:80"
     depends_on:
